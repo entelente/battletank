@@ -1,5 +1,13 @@
 *.VC.*
 
+# Clion files
+.idea
+*.workspace
+cmake-build-debug/
+CMakeLists.txt
+BattleTankCodeLitePreProcessor.txt
+BattleTankCodeCompletionFolders.txt
+
 # Visual Studio 2015 user specific files
 .vs/
 
