@@ -35,54 +35,54 @@ void ATankPlayerController::AimTowardsCrosshair()
 {
 	if (!GetControlledTank()) { return; }
 
-	FVector HitLocation;
-	if (GetSightRayHitLocation(HitLocation))
+	FVector hit_location;
+	if (GetSightRayHitLocation(hit_location))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hitlocation: %s"), *HitLocation.ToString());
+		GetControlledTank()->AimAt(hit_location);
 	} else
     {
         UE_LOG(LogTemp, Warning, TEXT("Hitlocation: *NO HIT*"));
     }
 }
 
-bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) const
+bool ATankPlayerController::GetSightRayHitLocation(FVector& out_hit_location) const
 {
-	int32 ViewportSizeX, ViewportSizeY;
-	GetViewportSize(ViewportSizeX, ViewportSizeY);
-	auto ScreenLocation = FVector2D(ViewportSizeX * CrosshairXLocation, ViewportSizeY * CrosshairYLocation);
+	int32 viewport_size_x, viewport_size_y;
+	GetViewportSize(viewport_size_x, viewport_size_y);
+	const auto screen_location = FVector2D(viewport_size_x * CrosshairXLocation, viewport_size_y * CrosshairYLocation);
 
-    FVector LookDirection;
-    if(GetLookAtDirection(ScreenLocation, LookDirection))
+    FVector look_direction;
+    if(GetLookAtDirection(screen_location, look_direction))
     {
-        FVector HitLocation;
-        if(GetLookVectorHitLocation(LookDirection, HitLocation))
+        FVector hit_location;
+        if(GetLookVectorHitLocation(look_direction, hit_location))
 		{
-			OutHitLocation = HitLocation;
+			out_hit_location = hit_location;
             return true;
 		}
     }
-	OutHitLocation = FVector::ZeroVector;
+	out_hit_location = FVector::ZeroVector;
 	return false;
 }
 
-bool ATankPlayerController::GetLookAtDirection(const FVector2D ScreenLocation, FVector &WorldDirection) const
+bool ATankPlayerController::GetLookAtDirection(const FVector2D screen_location, FVector &world_direction) const
 {
-    FVector WorldLocaton;
-    return DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, WorldLocaton, WorldDirection);
+    FVector world_locaton;
+    return DeprojectScreenPositionToWorld(screen_location.X, screen_location.Y, world_locaton, world_direction);
 }
 
-bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector & HitLocation) const
+bool ATankPlayerController::GetLookVectorHitLocation(const FVector look_direction, FVector & hit_location) const
 {
-	FHitResult HitResult;
-	auto StartLocation = PlayerCameraManager->GetCameraLocation();
-	auto EndLocation = StartLocation + (LookDirection * LineTraceRange);
-	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility))
+	FHitResult hit_result;
+	const auto start_location = PlayerCameraManager->GetCameraLocation();
+	const auto end_location = start_location + (look_direction * LineTraceRange);
+	if(GetWorld()->LineTraceSingleByChannel(hit_result, start_location, end_location, ECollisionChannel::ECC_Visibility))
 	{
-		HitLocation = HitResult.Location;
+		hit_location = hit_result.Location;
 		return true;
 	}
-    HitLocation = FVector::ZeroVector;
-	return false;
+    hit_location = FVector::ZeroVector;
+	return false;	
 }
 
 
