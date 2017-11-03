@@ -49,18 +49,28 @@ void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 		false,
 		0,
 		0,
-		ESuggestProjVelocityTraceOption::DoNotTrace))
+		ESuggestProjVelocityTraceOption::DoNotTrace
+		))
 	{
 		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
 		auto our_tank_name = GetOwner()->GetName();
 		auto from = Barrel->GetComponentLocation().ToString();
 		UE_LOG(LogTemp, Warning, TEXT("%s aiming at: %s from %s location. SugLaunchspeed: %f, AimDir: %s"),
-			*our_tank_name, *WorldSpaceAim.ToString(), *from, OutLaunchVelocity.Size(), *AimDirection.ToString());		
+			*our_tank_name, *WorldSpaceAim.ToString(), *from, OutLaunchVelocity.Size(), *AimDirection.ToString());
+
+		MoveBarrel(AimDirection);
 	}
+}
+
+void UTankAimingComponent::MoveBarrel(const FVector AimDirection)
+{	
+	auto BarrelRotation = Barrel->GetForwardVector().Rotation();
+	auto AimAsRotator = AimDirection.Rotation();
+	auto DeltaRotator = AimAsRotator - BarrelRotation;
+	Barrel->SetWorldRotation(AimAsRotator.Quaternion());
 }
 
 void UTankAimingComponent::SetBarrelReference(UStaticMeshComponent* BarrelToSet)
 {
 	Barrel = BarrelToSet;
 }
-

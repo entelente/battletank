@@ -30,4 +30,5 @@ public:
 		
 private:
 	UStaticMeshComponent* Barrel = nullptr;
+	void MoveBarrel(const FVector AimDirection);
 };
