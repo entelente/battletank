@@ -35,9 +35,28 @@ void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 {
-	auto our_tank_name = GetOwner()->GetName();
-	auto from = Barrel->GetComponentLocation().ToString();
-	UE_LOG(LogTemp, Warning, TEXT("%s aiming at: %s from %s location. Launchspeed: %f"), *our_tank_name, *WorldSpaceAim.ToString(), *from, LaunchSpeed);
+	if (!Barrel) { return; }
+
+	FVector OutLaunchVelocity;
+	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
+
+	if(UGameplayStatics::SuggestProjectileVelocity(
+		this,
+		OutLaunchVelocity,
+		StartLocation,
+		WorldSpaceAim,
+		LaunchSpeed,
+		false,
+		0,
+		0,
+		ESuggestProjVelocityTraceOption::DoNotTrace))
+	{
+		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
+		auto our_tank_name = GetOwner()->GetName();
+		auto from = Barrel->GetComponentLocation().ToString();
+		UE_LOG(LogTemp, Warning, TEXT("%s aiming at: %s from %s location. SugLaunchspeed: %f, AimDir: %s"),
+			*our_tank_name, *WorldSpaceAim.ToString(), *from, OutLaunchVelocity.Size(), *AimDirection.ToString());		
+	}
 }
 
 void UTankAimingComponent::SetBarrelReference(UStaticMeshComponent* BarrelToSet)
