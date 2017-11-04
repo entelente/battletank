@@ -60,6 +60,10 @@ void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 			*our_tank_name, *WorldSpaceAim.ToString(), *from, OutLaunchVelocity.Size(), *AimDirection.ToString());
 
 		MoveBarrel(AimDirection);
+	} else
+	{
+		auto our_tank_name = GetOwner()->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("%s has no target"), *our_tank_name);
 	}
 }
 
